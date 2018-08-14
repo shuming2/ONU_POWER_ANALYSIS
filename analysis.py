@@ -1,3 +1,5 @@
+import time
+
 import clipboard as clipboard
 import tkinter
 from tkinter import ttk
@@ -17,7 +19,7 @@ class Analysis(object):
 
         # Manu Bar
         self.menu_bar = tkinter.Menu(self.root, tearoff=0)
-        self.menu_bar.add_command(label='文件')
+        # self.menu_bar.add_command(label='文件')
 
         self.menu_about = tkinter.Menu(self.menu_bar, tearoff=0)
         self.menu_about.add_command(label='更新数据', command=self._update_db)
@@ -64,6 +66,36 @@ class Analysis(object):
         self.search_result_treeview.configure(yscrollcommand=self.treeview_scrollbar.set)
 
         # TODO: Alert Tab
+        # Alert Tab
+        # self.column_name = tkinter.StringVar()
+        # self.column_name_combobox = ttk.Combobox(self.alert_tab, width=20, textvariable=self.column_name,
+        #                                          state='readonly')
+        # self.column_name_combobox['values'] = ('ONU_NAME', 'ONU_SN')
+        # self.column_name_combobox.set('ONU_NAME')
+        #
+        # self.search_input = tkinter.StringVar()
+        # self.search_entry = tkinter.Entry(self.alert_tab, width=45, textvariable=self.search_input)
+        # self.search_entry.bind('<Return>', self._search)
+        # self.result_button = tkinter.Button(self.alert_tab, width=5, command=self._search, text='查询')
+        #
+        # self.frame1 = tkinter.Frame(self.alert_tab)
+        # # TreeView
+        # self.search_result_treeview = ttk.Treeview(self.frame1, show='headings', selectmode='browse')
+        # self.search_result_treeview.grid_size()
+        # self.search_result_treeview.bind('<Double-Button-1>', self._show_chart)
+        # self.treeview_column_config = {"ONU_NAME": 380, "ONU_SN": 160}
+        # self._set_up_treeview(self.search_result_treeview, self.treeview_column_config)
+        #
+        # # Copy Menu
+        # self.copy_menu = tkinter.Menu(self.search_result_treeview, tearoff=0)
+        # self.copy_menu.add_command(label="复制", command=self._copy_handler)
+        # self.copy_menu.add_command(label="详情", command=self._show_chart)
+        # self.search_result_treeview.bind('<3>', self._show_copy_menu)
+        #
+        # # ScrollBar
+        # self.treeview_scrollbar = ttk.Scrollbar(self.frame1, orient='vertical',
+        #                                         command=self.search_result_treeview.yview)
+        # self.search_result_treeview.configure(yscrollcommand=self.treeview_scrollbar.set)
 
     def gui_arrang(self):
         self.tab_control.pack(expand=1, fill='both')
@@ -95,7 +127,6 @@ class Analysis(object):
             treeview.column(column, width=width, anchor='w')
             treeview.heading(column, text=column)
 
-    # TODO: Show chart
     def _show_chart(self, event=None):
         items = self.search_result_treeview.selection()
         if len(items) == 0:
@@ -137,13 +168,9 @@ class Analysis(object):
         return distinct_lst
 
     def _update_db(self):
-        self.root.withdraw()
-
-        update_dialog = UpdateDialog(self.db, self.cursor)
+        update_dialog = UpdateDialog(self.root, self.db, self.cursor)
         update_dialog.gui_arrang()
-        update_dialog.update()
-        # self.root.wait_window(update_dialog)
 
-        self.root.update()
-        self.root.deiconify()
+        self.root.wait_window(update_dialog)
+
         self._search()
