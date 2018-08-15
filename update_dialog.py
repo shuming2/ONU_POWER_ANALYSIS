@@ -16,6 +16,7 @@ class UpdateDialog(tkinter.Toplevel):
         self.transient(parent)
         self.grab_set()
         self.geometry("+%d+%d" % (parent.winfo_rootx() + 50, parent.winfo_rooty() + 50))
+        self.resizable(0, 0)
 
         self.title('更新数据')
         self.frame = tkinter.Frame(self)
@@ -27,7 +28,7 @@ class UpdateDialog(tkinter.Toplevel):
         self.text.configure(yscrollcommand=self.text_scrollbar.set)
 
         self.frame2 = tkinter.Frame(self.frame)
-        self.button = tkinter.Button(self.frame2, text="开始更新", command=self.update_db)
+        self.button = tkinter.Button(self.frame2, text="开始更新", command=self._update_db)
 
         self.db = db
         self.cursor = cursor
@@ -41,7 +42,7 @@ class UpdateDialog(tkinter.Toplevel):
         self.frame2.pack()
         self.button.pack(anchor=tkinter.CENTER, pady=5)
 
-    def update_db(self):
+    def _update_db(self):
         # Close Button
         self.protocol("WM_DELETE_WINDOW", self._show_warning)
 

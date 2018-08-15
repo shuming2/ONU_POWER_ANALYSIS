@@ -1,8 +1,7 @@
 import tkinter
 
-import pymysql
-from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 
 from sql_command import *
 
@@ -21,8 +20,8 @@ class Chart(object):
 
         self.a = self.figure.add_subplot(111)
         self.date_lst, self.power_avg_lst = self._get_data_from_db_by_name(cursor, title)
-        # self.a.xaxis.set_major_formatter(matplotlib.dates.DateFormatter('%y/%m/%d'))
-        self.a.axes.set_xticklabels(labels=list(dict.fromkeys(self.date_lst)), fontdict={'rotation': 40, 'size': 'small'})
+        self.a.axes.set_xticklabels(labels=list(dict.fromkeys(self.date_lst)),
+                                    fontdict={'rotation': 40, 'size': 'small'})
 
         # Show text tab when hovering on scattered points
         # From ImportanceOfBeingErnest
@@ -84,23 +83,3 @@ class Chart(object):
         self.annot.xy = self.sc.get_offsets()[i]
         self.annot.set_text(str(self.power_avg_lst[i]))
         self.annot.get_bbox_patch().set_alpha(0.4)
-
-
-def connect_db(username, pwd, db_name):
-    connect = pymysql.connect('localhost', username, pwd, db_name)
-    cursor = connect.cursor()
-    return connect, cursor
-
-
-def test():
-    db, cursor = connect_db('amber', '19950613', 'cm_gpon_report')
-
-    chart = Chart('家客_SDWH00246919', db, cursor)
-    chart.gui_arrang()
-    tkinter.mainloop()
-    db.close()
-
-
-if __name__ == '__main__':
-    test()
-

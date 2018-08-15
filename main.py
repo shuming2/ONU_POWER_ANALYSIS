@@ -2,9 +2,10 @@ import re
 import tkinter
 
 import pymysql
+
 from analysis import Analysis
-from sql_command import *
 from config import *
+from sql_command import *
 
 
 def check_table_exist(cursor, table_name):

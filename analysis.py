@@ -1,13 +1,14 @@
 import datetime
 import time
-
-import clipboard as clipboard
 import tkinter
 from tkinter import ttk, messagebox
-from sql_command import *
+
+import clipboard as clipboard
+
 from chart import Chart
+from config_dialog import ConfigDialog
+from sql_command import *
 from update_dialog import UpdateDialog
-from config import ALERT_THRESHOLD
 
 
 class Analysis(object):
@@ -21,8 +22,6 @@ class Analysis(object):
 
         # Manu Bar
         self.menu_bar = tkinter.Menu(self.root, tearoff=0)
-        # self.menu_bar.add_command(label='文件')
-
         self.menu_file = tkinter.Menu(self.menu_bar, tearoff=0)
         self.menu_file.add_command(label='更新数据', command=self._update_db)
         self.menu_file.add_command(label='设置', command=self._config)
@@ -149,7 +148,7 @@ class Analysis(object):
 
         # Status Bar
         self.status_bar = ttk.Frame(self.root)
-        self.version_label = ttk.Label(self.status_bar, text='数据库版本时间： '+self._get_version_time())
+        self.version_label = ttk.Label(self.status_bar, text='数据库版本时间： ' + self._get_version_time())
         # Progress Bar
         self.scan_percentage_label = ttk.Label(self.status_bar, text='')
         self.scan_status_label = ttk.Label(self.status_bar, text='')
@@ -282,7 +281,7 @@ class Analysis(object):
         update_dialog = UpdateDialog(self.root, self.db, self.cursor)
         update_dialog.gui_arrang()
         self.root.wait_window(update_dialog)
-        self.version_label.configure(text = '数据库版本时间： ' + self._get_version_time())
+        self.version_label.configure(text='数据库版本时间： ' + self._get_version_time())
         self._search()
 
     @staticmethod
@@ -379,25 +378,21 @@ class Analysis(object):
             for ele in data:
                 if ele[1] in scan_dic.keys():
                     value = ele[3] - scan_dic[ele[1]]
-                    if value < -ALERT_THRESHOLD:
+                    if value < -self._get_alert_threshold():
                         result_str = [ele[0].strftime('%y/%m/%d'), ele[1], ele[2], str(round(value, 2))]
                         self.scan_result_treeview.insert('', scan_treeview_index, values=tuple(result_str))
                         scan_treeview_index += 1
                         self.scan_result_treeview.update()
                 scanned_number += 1
                 self._update_scan_results(scan_treeview_index, scanned_number, total_number)
-        print("Execution time: {} s".format(time.time()-t))
-
-    # TODO
-    def _config(self):
-        pass
+        print("Execution time: {} s".format(time.time() - t))
 
     def _update_scan_results(self, found_number, scanned_number, total_number):
         if total_number == 0:
             self.scan_status_label.configure(text='该时间段内没有数据')
             return
-        self.scan_percentage_label.configure(text='%3s %%' % str(scanned_number*100//total_number))
-        self.progress_bar.coords(self.fill_line, (2, 2, scanned_number*100//total_number, 10))
+        self.scan_percentage_label.configure(text='%3s %%' % str(scanned_number * 100 // total_number))
+        self.progress_bar.coords(self.fill_line, (2, 2, scanned_number * 100 // total_number, 10))
         self.scan_status_label.configure(text='发现 {} 条告警 {} / {}'.format(found_number, scanned_number, total_number))
         self.status_bar.update()
 
@@ -405,3 +400,17 @@ class Analysis(object):
         self.scan_percentage_label.pack_forget()
         self.progress_bar.pack_forget()
         self.scan_status_label.pack_forget()
+
+    def _config(self):
+        config_dialog = ConfigDialog(self.root)
+        config_dialog.gui_arrang()
+        self.root.wait_window(config_dialog)
+
+    @staticmethod
+    def _get_alert_threshold():
+        alert_threshold = 0
+        with open('config.py', 'r') as config_file:
+            for line in config_file:
+                if 'ALERT_THRESHOLD ' in line or 'ALERT_THRESHOLD=' in line:
+                    alert_threshold = line.strip().split('=')[1].strip()
+        return int(alert_threshold)
