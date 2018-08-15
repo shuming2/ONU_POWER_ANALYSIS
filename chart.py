@@ -21,8 +21,6 @@ class Chart(object):
 
         self.a = self.figure.add_subplot(111)
         self.date_lst, self.power_avg_lst = self._get_data_from_db_by_name(cursor, title)
-        print(self.date_lst)
-        print(self.power_avg_lst)
         # self.a.xaxis.set_major_formatter(matplotlib.dates.DateFormatter('%y/%m/%d'))
         self.a.axes.set_xticklabels(labels=list(dict.fromkeys(self.date_lst)), fontdict={'rotation': 40, 'size': 'small'})
 
@@ -55,12 +53,10 @@ class Chart(object):
     def _get_data_from_db_by_name(cursor, onu_name):
         cursor.execute(SELECT_DATA_BY_GPON_REPORT_OLT.format(onu_name))
         results = list(cursor.fetchall())
-        print(results)
         date_lst = []
         power_avg_lst = []
         for ele in results:
             date_lst.append(ele[1].strftime('%y/%m/%d'))
-            # date_lst.append(ele[1])
             power_avg_lst.append(ele[0])
         return date_lst, power_avg_lst
 

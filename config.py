@@ -15,3 +15,6 @@ API_URL = 'http://10.213.54.148:8080/ServiceOpenFrame/data/GPON_REPORT_ONUFIBERN
 CONTENT_TYPE = 'application/x-www-form-urlencoded'
 APP_KEY = 'df994502-f4a5-4f44-90d8-2168e71ccc22'
 APP_SECRET = 'z1mVTgq7wpReR9dUL9dy'
+
+# Alert
+ALERT_THRESHOLD = 1

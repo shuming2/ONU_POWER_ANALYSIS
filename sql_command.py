@@ -1,5 +1,15 @@
 
-SELECT_DATA_BY_GPON_REPORT_OLT = """SELECT FIBER_POWER_AVG, STATIS_TIME
+
+SELECT_COUNT_IN_TIME_PERIOD = """SELECT MIN(STATIS_TIME), MAX(STATIS_TIME), COUNT(DISTINCT STATIS_TIME, GPON_REPORT_OLT, ONU_SN, FIBER_POWER_AVG)
+                                 FROM ONUFIBERN
+                                 WHERE STATIS_TIME >= '{}'
+                                 AND STATIS_TIME <= '{}';"""
+
+SELECT_DATA_BY_STATIS_TIME = """SELECT DISTINCT STATIS_TIME, GPON_REPORT_OLT, ONU_SN, FIBER_POWER_AVG
+                                FROM ONUFIBERN
+                                WHERE STATIS_TIME = '{}';"""
+
+SELECT_DATA_BY_GPON_REPORT_OLT = """SELECT DISTINCT FIBER_POWER_AVG, STATIS_TIME
                                     FROM ONUFIBERN
                                     WHERE GPON_REPORT_OLT = '{}';"""
 

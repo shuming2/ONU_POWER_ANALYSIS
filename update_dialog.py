@@ -141,7 +141,7 @@ class UpdateDialog(tkinter.Toplevel):
             'app_key': APP_KEY,
             'app_secret': APP_SECRET,
             'conditions': json.dumps([{'cn': 'STATIS_TIME', 'op': '=', 'cv': update_time_str},
-                                      {'cn': 'CITY_NAME ', 'op': '=', 'cv': '威海'}])  # TODO: Optimization for Re-use
+                                      {'cn': 'CITY_NAME ', 'op': '=', 'cv': '威海'}])
         }
         response = requests.post(API_URL,
                                  headers={'Content-Type': CONTENT_TYPE},
@@ -157,7 +157,6 @@ class UpdateDialog(tkinter.Toplevel):
         current_time = datetime.datetime.now()
         return current_time.strftime('[%Y/%m/%d %H:%M:%S]')
 
-    # TODO
     def _show_warning(self):
         answer = messagebox.askokcancel(title='警告',
                                         message='现在退出会导致数据缺失，确认要退出吗？',
