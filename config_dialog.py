@@ -1,3 +1,5 @@
+import os
+import sys
 import tkinter
 from tkinter import ttk, Spinbox
 from config import ALERT_THRESHOLD
@@ -11,6 +13,9 @@ class ConfigDialog(tkinter.Toplevel):
         self.geometry("+%d+%d" % (parent.winfo_rootx() + 50, parent.winfo_rooty() + 50))
         self.resizable(0, 0)
         self.title('设置')
+        icopath = self._resource_path(r'pic/panda.ico')
+        if os.path.exists(icopath):
+            self.iconbitmap(icopath)
 
         self.frame = ttk.Frame(self)
         self.alert_threshold_label = ttk.Label(self.frame, text='告警阈值：')
@@ -31,9 +36,10 @@ class ConfigDialog(tkinter.Toplevel):
         self.cancel_button.grid(row=2, column=4, pady=5)
 
     def _update_alert_threshold(self):
-        with open('config.py', 'r') as config_file:
+        config_path = self._resource_path(r'config.py')
+        with open(config_path, 'r') as config_file:
             lines = config_file.readlines()
-        with open('config.py', 'w') as new_config_file:
+        with open(config_path, 'w') as new_config_file:
             for line in lines:
                 if 'ALERT_THRESHOLD ' in line or 'ALERT_THRESHOLD=' in line:
                     new_config_file.write('ALERT_THRESHOLD = {}\n'.format(self.alert_threshold_spinbox.get()))
@@ -41,11 +47,18 @@ class ConfigDialog(tkinter.Toplevel):
                     new_config_file.write(line)
         self.destroy()
 
-    @staticmethod
-    def _get_alert_threshold():
+    def _get_alert_threshold(self):
         alert_threshold = 0
-        with open('config.py', 'r') as config_file:
+        config_path = self._resource_path(r'config.py')
+        with open(config_path, 'r') as config_file:
             for line in config_file:
                 if 'ALERT_THRESHOLD ' in line or 'ALERT_THRESHOLD=' in line:
                     alert_threshold = line.strip().split('=')[1].strip()
         return int(alert_threshold)
+
+    @staticmethod
+    def _resource_path(relative):
+        if hasattr(sys, "_MEIPASS"):
+            return os.path.join(sys._MEIPASS, relative)
+        return os.path.join(relative)
+

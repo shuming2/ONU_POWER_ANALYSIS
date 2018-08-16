@@ -1,5 +1,7 @@
 import datetime
 import json
+import os
+import sys
 import time
 import tkinter
 from tkinter import ttk, messagebox
@@ -17,6 +19,9 @@ class UpdateDialog(tkinter.Toplevel):
         self.grab_set()
         self.geometry("+%d+%d" % (parent.winfo_rootx() + 50, parent.winfo_rooty() + 50))
         self.resizable(0, 0)
+        icopath = self._resource_path(r'pic/panda.ico')
+        if os.path.exists(icopath):
+            self.iconbitmap(icopath)
 
         self.title('更新数据')
         self.frame = tkinter.Frame(self)
@@ -164,3 +169,10 @@ class UpdateDialog(tkinter.Toplevel):
                                         default='cancel')
         if answer:
             self.destroy()
+
+    @staticmethod
+    def _resource_path(relative):
+        if hasattr(sys, "_MEIPASS"):
+            return os.path.join(sys._MEIPASS, relative)
+        return os.path.join(relative)
+

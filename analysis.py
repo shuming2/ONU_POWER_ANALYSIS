@@ -1,4 +1,6 @@
 import datetime
+import os
+import sys
 import time
 import tkinter
 from tkinter import ttk, messagebox
@@ -19,6 +21,10 @@ class Analysis(object):
         self.root = tkinter.Tk()
         self.root.title("家客ONU光功率分析")
         self.root.resizable(0, 0)
+
+        icopath = self._resource_path(r'pic/panda.ico')
+        if os.path.exists(icopath):
+            self.root.iconbitmap(icopath)
 
         # Manu Bar
         self.menu_bar = tkinter.Menu(self.root, tearoff=0)
@@ -406,11 +412,17 @@ class Analysis(object):
         config_dialog.gui_arrang()
         self.root.wait_window(config_dialog)
 
-    @staticmethod
-    def _get_alert_threshold():
+    def _get_alert_threshold(self):
         alert_threshold = 0
-        with open('config.py', 'r') as config_file:
+        config_path = self._resource_path(r'config.py')
+        with open(config_path, 'r') as config_file:
             for line in config_file:
                 if 'ALERT_THRESHOLD ' in line or 'ALERT_THRESHOLD=' in line:
                     alert_threshold = line.strip().split('=')[1].strip()
         return int(alert_threshold)
+
+    @staticmethod
+    def _resource_path(relative):
+        if hasattr(sys, "_MEIPASS"):
+            return os.path.join(sys._MEIPASS, relative)
+        return os.path.join(relative)

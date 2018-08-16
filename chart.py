@@ -1,3 +1,5 @@
+import os
+import sys
 import tkinter
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -14,6 +16,9 @@ class Chart(object):
         self.root = tkinter.Tk()
         self.root.title(title)
         self.root.resizable(0, 0)
+        icopath = self._resource_path(r'pic/panda.ico')
+        if os.path.exists(icopath):
+            self.root.iconbitmap(icopath)
 
         self.figure = Figure(figsize=(8, 5), dpi=100)
         self.chart = FigureCanvasTkAgg(self.figure, master=self.root)
@@ -83,3 +88,9 @@ class Chart(object):
         self.annot.xy = self.sc.get_offsets()[i]
         self.annot.set_text(str(self.power_avg_lst[i]))
         self.annot.get_bbox_patch().set_alpha(0.4)
+
+    @staticmethod
+    def _resource_path(relative):
+        if hasattr(sys, "_MEIPASS"):
+            return os.path.join(sys._MEIPASS, relative)
+        return os.path.join(relative)
