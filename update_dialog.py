@@ -72,7 +72,17 @@ class UpdateDialog(tkinter.Toplevel):
         empty_days = 0
         data_count = 0
         for update_time in self.update_time_lst:
-            data_lst = self._get_data_from_api(update_time)
+            try:
+                data_lst = self._get_data_from_api(update_time)
+            except requests.exceptions.ConnectionError:
+                self.text.configure(state='normal')
+                self.text.insert(tkinter.END, '{} 更新失败, 请检查网络设置。\n'.format(self._get_current_time_str()))
+                self.text.see(tkinter.END)
+                self.text.configure(state='disabled')
+                self.button.configure(state='normal')
+                # Close Button
+                self.protocol("WM_DELETE_WINDOW", self.destroy)
+                return
             if not data_lst:
                 data_lst = []
 
@@ -149,6 +159,7 @@ class UpdateDialog(tkinter.Toplevel):
             'conditions': json.dumps([{'cn': 'STATIS_TIME', 'op': '=', 'cv': update_time_str},
                                       {'cn': 'CITY_NAME ', 'op': '=', 'cv': '威海'}])
         }
+
         response = requests.post(API_URL,
                                  headers={'Content-Type': CONTENT_TYPE},
                                  params=params)
