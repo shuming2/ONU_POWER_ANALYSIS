@@ -45,13 +45,13 @@ class Analysis(object):
 
         # Search Tab
         self.column_name = tkinter.StringVar()
-        self.column_name_combobox = ttk.Combobox(self.search_tab, width=20, textvariable=self.column_name,
+        self.column_name_combobox = ttk.Combobox(self.search_tab, width=10, textvariable=self.column_name,
                                                  state='readonly')
         self.column_name_combobox['values'] = ('ONU_NAME', 'ONU_SN')
         self.column_name_combobox.set('ONU_NAME')
 
         self.search_input = tkinter.StringVar()
-        self.search_entry = tkinter.Entry(self.search_tab, width=45, textvariable=self.search_input)
+        self.search_entry = tkinter.Entry(self.search_tab, width=50, textvariable=self.search_input)
         self.search_entry.bind('<Return>', self._search)
         self.result_button = tkinter.Button(self.search_tab, width=5, command=self._search, text='查询')
 
@@ -60,7 +60,7 @@ class Analysis(object):
         self.search_result_treeview = ttk.Treeview(self.frame1, show='headings', selectmode='browse')
         self.search_result_treeview.grid_size()
         self.search_result_treeview.bind('<Double-Button-1>', self._show_chart)
-        self.treeview_column_config = {'ONU_NAME': 380, 'ONU_SN': 160}
+        self.treeview_column_config = {'ONU_NAME': 450, 'ONU_SN': 170}
         self._set_up_treeview(self.search_result_treeview, self.treeview_column_config)
 
         # Copy Menu
@@ -138,7 +138,7 @@ class Analysis(object):
         self.scan_result_treeview = ttk.Treeview(self.frame2, show='headings', selectmode='browse')
         self.scan_result_treeview.grid_size()
         self.scan_result_treeview.bind('<Double-Button-1>', self._show_scan_chart)
-        self.scan_treeview_column_config = {'DATE': 60, 'ONU_NAME': 300, 'ONU_SN': 130, 'VALUE': 50}
+        self.scan_treeview_column_config = {'DATE': 80, 'ONU_NAME': 300, 'ONU_SN': 160, 'VALUE': 80}
         self._set_up_treeview(self.scan_result_treeview, self.scan_treeview_column_config)
 
         # Copy Menu
