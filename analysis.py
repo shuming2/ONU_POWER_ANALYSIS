@@ -327,6 +327,7 @@ class Analysis(object):
             return '-'
 
     def _scan(self, event=None):
+        self.scan_button.configure(state='disabled')
         t = time.time()
         # Clear treeview
         items = self.scan_result_treeview.get_children()
@@ -391,6 +392,7 @@ class Analysis(object):
                         self.scan_result_treeview.update()
                 scanned_number += 1
                 self._update_scan_results(scan_treeview_index, scanned_number, total_number)
+        self.scan_button.configure(state='normal')
         print("Execution time: {} s".format(time.time() - t))
 
     def _update_scan_results(self, found_number, scanned_number, total_number):
