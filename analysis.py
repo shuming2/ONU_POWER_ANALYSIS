@@ -8,7 +8,7 @@ from tkinter import ttk, messagebox
 import clipboard as clipboard
 
 from chart import Chart
-from config_dialog import ConfigDialog
+from config_dialog import AlertConfigDialog
 from sql_command import *
 from update_dialog import UpdateDialog
 
@@ -26,11 +26,14 @@ class Analysis(object):
         if os.path.exists(icopath):
             self.root.iconbitmap(icopath)
 
-        # Manu Bar
+        # Manu Bar TODO
         self.menu_bar = tkinter.Menu(self.root, tearoff=0)
         self.menu_file = tkinter.Menu(self.menu_bar, tearoff=0)
+        self.menu_config = tkinter.Menu(self.menu_file, tearoff=0)
         self.menu_file.add_command(label='更新数据', command=self._update_db)
-        self.menu_file.add_command(label='设置', command=self._config)
+        self.menu_config.add_command(label='数据库设置', command=self._db_config)
+        self.menu_config.add_command(label='告警设置', command=self._alert_config)
+        self.menu_file.add_cascade(label='设置', menu=self.menu_config)
         self.menu_bar.add_cascade(label='文件', menu=self.menu_file)
 
         self.root['menu'] = self.menu_bar
@@ -409,10 +412,10 @@ class Analysis(object):
         self.progress_bar.pack_forget()
         self.scan_status_label.pack_forget()
 
-    def _config(self):
-        config_dialog = ConfigDialog(self.root)
-        config_dialog.gui_arrang()
-        self.root.wait_window(config_dialog)
+    def _alert_config(self):
+        alert_config_dialog = AlertConfigDialog(self.root)
+        alert_config_dialog.gui_arrang()
+        self.root.wait_window(alert_config_dialog)
 
     def _get_alert_threshold(self):
         alert_threshold = 0
@@ -428,3 +431,10 @@ class Analysis(object):
         if hasattr(sys, "_MEIPASS"):
             return os.path.join(sys._MEIPASS, relative)
         return os.path.join(relative)
+
+    # TODO
+    def _db_config(self):
+        alert_config_dialog = AlertConfigDialog(self.root)
+        alert_config_dialog.gui_arrang()
+        self.root.wait_window(alert_config_dialog)
+        pass
