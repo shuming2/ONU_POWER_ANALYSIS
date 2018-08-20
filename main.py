@@ -17,7 +17,7 @@ def check_table_exist(cursor, table_name):
     table_list = [re.sub("'", '', each) for each in table_list]
     return table_name in table_list
 
-
+# TODO: 数据库连接失败
 def connect_db(username, pwd, db_name, table_name):
     table_name = table_name.lower()
     connect = pymysql.connect('localhost', username, pwd, db_name)

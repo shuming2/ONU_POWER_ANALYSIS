@@ -8,7 +8,7 @@ from tkinter import ttk, messagebox
 import clipboard as clipboard
 
 from chart import Chart
-from config_dialog import AlertConfigDialog
+from config_dialog import AlertConfigDialog, DBConfigDialog
 from sql_command import *
 from update_dialog import UpdateDialog
 
@@ -26,7 +26,7 @@ class Analysis(object):
         if os.path.exists(icopath):
             self.root.iconbitmap(icopath)
 
-        # Manu Bar TODO
+        # Manu Bar
         self.menu_bar = tkinter.Menu(self.root, tearoff=0)
         self.menu_file = tkinter.Menu(self.menu_bar, tearoff=0)
         self.menu_config = tkinter.Menu(self.menu_file, tearoff=0)
@@ -432,9 +432,8 @@ class Analysis(object):
             return os.path.join(sys._MEIPASS, relative)
         return os.path.join(relative)
 
-    # TODO
     def _db_config(self):
-        alert_config_dialog = AlertConfigDialog(self.root)
-        alert_config_dialog.gui_arrang()
-        self.root.wait_window(alert_config_dialog)
+        db_config_dialog = DBConfigDialog(self.root)
+        db_config_dialog.gui_arrang()
+        self.root.wait_window(db_config_dialog)
         pass
