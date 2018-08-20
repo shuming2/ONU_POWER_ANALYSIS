@@ -46,6 +46,7 @@ class UpdateDialog(tkinter.Toplevel):
         self.text_scrollbar.pack(side=tkinter.RIGHT, fill='y')
         self.frame2.pack()
         self.button.pack(anchor=tkinter.CENTER, pady=5)
+        self.focus()
 
     def _update_db(self):
         # Close Button

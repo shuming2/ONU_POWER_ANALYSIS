@@ -2,7 +2,6 @@ import os
 import sys
 import tkinter
 from tkinter import ttk, Spinbox
-from config import ALERT_THRESHOLD
 
 
 class ConfigDialog(tkinter.Toplevel):
@@ -34,6 +33,7 @@ class ConfigDialog(tkinter.Toplevel):
 
         self.ok_button.grid(row=2, column=3, pady=5)
         self.cancel_button.grid(row=2, column=4, pady=5)
+        self.focus()
 
     def _update_alert_threshold(self):
         config_path = self._resource_path(r'config.py')
