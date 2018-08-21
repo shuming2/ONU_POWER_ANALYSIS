@@ -1,6 +1,7 @@
 import datetime
 
 # Database
+IP = 'localhost'
 USERNAME = 'amber'
 PWD = '19950613'
 DB_NAME = 'cm_gpon_report'

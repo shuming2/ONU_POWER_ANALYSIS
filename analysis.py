@@ -1,4 +1,5 @@
 import datetime
+import importlib
 import os
 import sys
 import time
@@ -11,16 +12,19 @@ from chart import Chart
 from config_dialog import AlertConfigDialog, DBConfigDialog
 from sql_command import *
 from update_dialog import UpdateDialog
+from connect_db_helper import ConnectDBHelper
+import config
 
 
 class Analysis(object):
-    def __init__(self, db, cursor):
-        self.db = db
-        self.cursor = cursor
+    def __init__(self):
+        self.helper = ConnectDBHelper(config.IP, config.USERNAME, config.PWD, config.DB_NAME, config.TABLE_NAME)
+        self.db, self.cursor = self.helper.connect()
 
         self.root = tkinter.Tk()
         self.root.title("家客ONU光功率分析")
         self.root.resizable(0, 0)
+        self.root.protocol("WM_DELETE_WINDOW", self._quit)
 
         icopath = self._resource_path(r'pic/panda.ico')
         if os.path.exists(icopath):
@@ -30,6 +34,7 @@ class Analysis(object):
         self.menu_bar = tkinter.Menu(self.root, tearoff=0)
         self.menu_file = tkinter.Menu(self.menu_bar, tearoff=0)
         self.menu_config = tkinter.Menu(self.menu_file, tearoff=0)
+        self.menu_file.add_command(label='连接数据库', command=self._reconnect_db)
         self.menu_file.add_command(label='更新数据', command=self._update_db)
         self.menu_config.add_command(label='数据库设置', command=self._db_config)
         self.menu_config.add_command(label='告警设置', command=self._alert_config)
@@ -157,7 +162,11 @@ class Analysis(object):
 
         # Status Bar
         self.status_bar = ttk.Frame(self.root)
-        self.version_label = ttk.Label(self.status_bar, text='数据库版本时间： ' + self._get_version_time())
+        if self.cursor:
+            self.version_label = ttk.Label(self.status_bar, text='数据库版本时间： ' + self._get_version_time())
+        else:
+            self.version_label = ttk.Label(self.status_bar, text='数据库连接失败')
+
         # Progress Bar
         self.scan_percentage_label = ttk.Label(self.status_bar, text='')
         self.scan_status_label = ttk.Label(self.status_bar, text='')
@@ -213,13 +222,16 @@ class Analysis(object):
         self.status_bar.pack(fill='x', padx=5)
         self.version_label.pack(side=tkinter.LEFT)
 
+        self.root.focus()
+
     def _search(self, event=None):
         items = self.search_result_treeview.get_children()
         list(map(self.search_result_treeview.delete, items))
-        results = self._get_search_results_from_db(self.cursor, self.column_name.get(), self.search_input.get())
-        for i, result in enumerate(results):
-            result_str = [str(ele) for ele in result]
-            self.search_result_treeview.insert('', i, values=tuple(result_str))
+        if self.cursor:
+            results = self._get_search_results_from_db(self.cursor, self.column_name.get(), self.search_input.get())
+            for i, result in enumerate(results):
+                result_str = [str(ele) for ele in result]
+                self.search_result_treeview.insert('', i, values=tuple(result_str))
         return
 
     @staticmethod
@@ -322,14 +334,16 @@ class Analysis(object):
         return last_day
 
     def _get_version_time(self):
-        self.cursor.execute(SELECT_MAX_STATIS_TIME)
-        latest_update_time = self.cursor.fetchone()[0]
-        if latest_update_time:
-            return latest_update_time.strftime('%Y-%m-%d')
-        else:
-            return '-'
+        if self.cursor:
+            self.cursor.execute(SELECT_MAX_STATIS_TIME)
+            latest_update_time = self.cursor.fetchone()[0]
+            if latest_update_time:
+                return latest_update_time.strftime('%Y-%m-%d')
+        return '-'
 
     def _scan(self, event=None):
+        if not self.cursor:
+            return
         self.scan_button.configure(state='disabled')
         t = time.time()
         # Clear treeview
@@ -361,6 +375,8 @@ class Analysis(object):
             self.scan_status_label.pack(side=tkinter.RIGHT)
         else:
             self.scan_status_label.pack(side=tkinter.RIGHT)
+            self.scan_button.configure(state='normal')
+            print("Execution time: {} s".format(time.time() - t))
             return
 
         scan_time_period = []
@@ -370,6 +386,7 @@ class Analysis(object):
             tmp_time += datetime.timedelta(days=1)
 
         scan_treeview_index = 0
+        alert_threshold = config.ALERT_THRESHOLD
         for scan_time in scan_time_period:
             if scan_time == start_time:
                 previous_date = scan_time - datetime.timedelta(days=1)
@@ -388,7 +405,7 @@ class Analysis(object):
             for ele in data:
                 if ele[1] in scan_dic.keys():
                     value = ele[3] - scan_dic[ele[1]]
-                    if value < -self._get_alert_threshold():
+                    if value < -alert_threshold:
                         result_str = [ele[0].strftime('%y/%m/%d'), ele[1], ele[2], str(round(value, 2))]
                         self.scan_result_treeview.insert('', scan_treeview_index, values=tuple(result_str))
                         scan_treeview_index += 1
@@ -416,15 +433,7 @@ class Analysis(object):
         alert_config_dialog = AlertConfigDialog(self.root)
         alert_config_dialog.gui_arrang()
         self.root.wait_window(alert_config_dialog)
-
-    def _get_alert_threshold(self):
-        alert_threshold = 0
-        config_path = self._resource_path(r'config.py')
-        with open(config_path, 'r') as config_file:
-            for line in config_file:
-                if 'ALERT_THRESHOLD ' in line or 'ALERT_THRESHOLD=' in line:
-                    alert_threshold = line.strip().split('=')[1].strip()
-        return int(alert_threshold)
+        importlib.reload(config)
 
     @staticmethod
     def _resource_path(relative):
@@ -436,4 +445,22 @@ class Analysis(object):
         db_config_dialog = DBConfigDialog(self.root)
         db_config_dialog.gui_arrang()
         self.root.wait_window(db_config_dialog)
-        pass
+        importlib.reload(config)
+        self._reconnect_db()
+
+    def _quit(self):
+        if self.db:
+            self.db.close()
+        self.root.destroy()
+
+    def _reconnect_db(self):
+        self.helper = ConnectDBHelper(config.IP, config.USERNAME, config.PWD, config.DB_NAME, config.TABLE_NAME)
+        self.db, self.cursor = self.helper.connect()
+        if self.cursor:
+            self.version_label.configure(text='数据库版本时间： ' + self._get_version_time())
+        else:
+            self.version_label.configure(text='数据库连接失败')
+            messagebox.showwarning(title='数据库连接失败', message='请检查数据库设置。')
+        self._search()
+
+

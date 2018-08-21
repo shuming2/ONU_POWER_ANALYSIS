@@ -37,7 +37,6 @@ class UpdateDialog(tkinter.Toplevel):
 
         self.db = db
         self.cursor = cursor
-        self.update_time_lst = self._get_update_time_lst()
 
     def gui_arrang(self):
         self.frame.pack(padx=10, pady=10, ipadx=5, ipady=0)
@@ -55,15 +54,6 @@ class UpdateDialog(tkinter.Toplevel):
         self.button.configure(text="确定", command=self.destroy, state='disabled')
         self.button.update()
 
-        # For test
-        # for i in range(0, 20):
-        #     self.text.configure(state='normal')
-        #     self.text.insert(tkinter.END, '{} 开始更新数据...\n'.format(self._get_current_time_str()))
-        #     self.text.see(tkinter.END)
-        #     self.text.configure(state='disabled')
-        #     self.text.update()
-        #     time.sleep(0.5)
-
         start_time = time.time()
         self.text.configure(state='normal')
         self.text.insert(tkinter.END, '{} 开始更新数据...\n'.format(self._get_current_time_str()))
@@ -72,6 +62,8 @@ class UpdateDialog(tkinter.Toplevel):
         self.text.update()
         empty_days = 0
         data_count = 0
+
+        self.update_time_lst = self._get_update_time_lst()
         for update_time in self.update_time_lst:
             try:
                 data_lst = self._get_data_from_api(update_time)

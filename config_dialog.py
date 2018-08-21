@@ -71,7 +71,7 @@ class AlertConfigDialog(ConfigDialog):
 
     def gui_arrang(self):
         self.frame.grid(row=0, column=0, padx=10, pady=5)
-        self.alert_threshold_label.grid(row=0, column=0)
+        self.alert_threshold_label.grid(row=0, column=0, sticky='W')
         self.alert_threshold_spinbox.grid(row=0, column=1)
         self.ok_button.grid(row=2, column=3, pady=5)
         self.cancel_button.grid(row=2, column=4, pady=5)
@@ -85,51 +85,49 @@ class DBConfigDialog(ConfigDialog):
     def __init__(self, parent):
         super().__init__(parent)
         self.title('数据库设置')
+        self.config_names = ['ip', 'username', 'pwd', 'db_name']
 
+        self.ip_label = ttk.Label(self.frame, text='IP地址：')
         self.username_label = ttk.Label(self.frame, text='用户名：')
         self.pwd_label = ttk.Label(self.frame, text='密码：')
         self.db_name_label = ttk.Label(self.frame, text='数据库名：')
-        self.table_name_label = ttk.Label(self.frame, text='表名：')
+        # self.table_name_label = ttk.Label(self.frame, text='表名：')
+        self.ui_labels = [self.ip_label, self.username_label, self.pwd_label, self.db_name_label]
 
+        self.ip_value = tkinter.StringVar()
         self.username_value = tkinter.StringVar()
         self.pwd_value = tkinter.StringVar()
         self.db_name_value = tkinter.StringVar()
-        self.table_name_value = tkinter.StringVar()
+        # self.table_name_value = tkinter.StringVar()
+        self.ui_values = [self.ip_value, self.username_value, self.pwd_value, self.db_name_value]
 
+        self.ip_entry = tkinter.Entry(self.frame, width=20, textvariable=self.ip_value)
         self.username_entry = tkinter.Entry(self.frame, width=20, textvariable=self.username_value)
         self.pwd_entry = tkinter.Entry(self.frame, width=20, textvariable=self.pwd_value)
         self.db_name_entry = tkinter.Entry(self.frame, width=20, textvariable=self.db_name_value)
-        self.table_name_entry = tkinter.Entry(self.frame, width=20, textvariable=self.table_name_value)
+        # self.table_name_entry = tkinter.Entry(self.frame, width=20, textvariable=self.table_name_value)
+        self.ui_entries = [self.ip_entry, self.username_entry, self.pwd_entry, self.db_name_entry]
+        self.pwd_entry['show'] = '*'
 
-        self.config_names = ['username', 'pwd', 'db_name', 'table_name']
         config_values = self._get_config(self.config_names)
-        self.username_value.set(config_values[0])
-        self.pwd_value.set(config_values[1])
-        self.db_name_value.set(config_values[2])
-        self.table_name_value.set(config_values[3])
+        for i in range(len(self.config_names)):
+            self.ui_values[i].set(config_values[i])
 
-        self.ok_button.configure(command=self._update_db_config)
+        self.ok_button.configure(command=self._update_db_config, text='连接')
 
     def gui_arrang(self):
         self.frame.grid(row=0, column=0, padx=10, pady=5)
-        self.username_label.grid(row=0, column=0)
-        self.pwd_label.grid(row=1, column=0)
-        self.db_name_label.grid(row=2, column=0)
-        self.table_name_label.grid(row=3, column=0)
+        for i in range(len(self.config_names)):
+            self.ui_labels[i].grid(row=i, column=0, sticky='W')
+            self.ui_entries[i].grid(row=i, column=1)
 
-        self.username_entry.grid(row=0, column=1)
-        self.pwd_entry.grid(row=1, column=1)
-        self.db_name_entry.grid(row=2, column=1)
-        self.table_name_entry.grid(row=3, column=1)
-
-        self.ok_button.grid(row=4, column=3, pady=5)
-        self.cancel_button.grid(row=4, column=4, pady=5)
+        self.ok_button.grid(row=len(self.config_names), column=3, pady=5)
+        self.cancel_button.grid(row=len(self.config_names), column=4, pady=5)
         self.focus()
 
     def _update_db_config(self):
         config_dict = {}
-        widgets = [self.username_value, self.pwd_value, self.db_name_value, self.table_name_value]
-        for i in range(4):
-            config_dict[self.config_names[i]] = "'{}'".format(widgets[i].get())
+        for i in range(len(self.config_names)):
+            config_dict[self.config_names[i]] = "'{}'".format(self.ui_values[i].get())
         self._set_config(config_dict)
 
