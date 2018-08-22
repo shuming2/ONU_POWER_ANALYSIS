@@ -67,7 +67,8 @@ class UpdateDialog(tkinter.Toplevel):
         for update_time in self.update_time_lst:
             try:
                 data_lst = self._get_data_from_api(update_time)
-            except requests.exceptions.ConnectionError:
+            except Exception as e:
+                print(e)
                 self.text.configure(state='normal')
                 self.text.insert(tkinter.END, '{} 更新失败, 请检查网络设置。\n'.format(self._get_current_time_str()))
                 self.text.see(tkinter.END)
@@ -76,18 +77,19 @@ class UpdateDialog(tkinter.Toplevel):
                 # Close Button
                 self.protocol("WM_DELETE_WINDOW", self.destroy)
                 return
-            if not data_lst:
-                data_lst = []
+            # if not data_lst:
+            #     data_lst = []
 
             empty_days = empty_days + 1 if not data_lst else 0
             if empty_days == MAX_EMPTY_DAYS:
                 break
 
-            for data in data_lst:
-                self._write_to_db(data)
-                self.update()
+            # for data in data_lst:
+            #     self._write_to_db(data)
+            #     self.update()
 
             if data_lst:
+                self._write_to_db(data_lst)
                 self.text.configure(state='normal')
                 self.text.insert(tkinter.END, '{} {} 更新成功, 共{}条数据...\n'.format(self._get_current_time_str(),
                                                                                update_time.strftime('%Y-%m-%d'),
@@ -122,19 +124,41 @@ class UpdateDialog(tkinter.Toplevel):
 
         return update_time_lst
 
-    def _write_to_db(self, data):
-        value_lst = []
-        for column_name in COLUMN_NAME_ONUFIBERN:
-            try:
-                value = data[column_name]
-                if type(value) == str:
-                    value_lst.append("'{}'".format(value))
-                else:
-                    value_lst.append("{}".format(value))
-            except KeyError:
-                value_lst.append('null')
+    # def _write_to_db(self, data):
+    #     value_lst = []
+    #     for column_name in COLUMN_NAME_ONUFIBERN:
+    #         try:
+    #             value = data[column_name]
+    #             if type(value) == str:
+    #                 value_lst.append("'{}'".format(value))
+    #             else:
+    #                 value_lst.append("{}".format(value))
+    #         except KeyError:
+    #             value_lst.append('null')
+    #
+    #     insert_command = INSERT_ONUFIBERN + '({});'.format(', '.join(value_lst))
+    #     try:
+    #         self.cursor.execute(insert_command)
+    #         self.db.commit()
+    #     except Exception as e:
+    #         print(e)
+    #         self.db.rollback()
 
-        insert_command = INSERT_ONUFIBERN + '({});'.format(', '.join(value_lst))
+    def _write_to_db(self, data_lst=None):
+        value_lst = []
+        for data in data_lst:
+            data_str_lst = []
+            for column_name in COLUMN_NAME_ONUFIBERN:
+                try:
+                    value = data[column_name]
+                    if type(value) == str:
+                        data_str_lst.append("'{}'".format(value))
+                    else:
+                        data_str_lst.append("{}".format(value))
+                except KeyError:
+                    data_str_lst.append('null')
+            value_lst.append('({})'.format(', '.join(value_lst)))
+        insert_command = INSERT_ONUFIBERN.format(', '.join(value_lst))
         try:
             self.cursor.execute(insert_command)
             self.db.commit()
@@ -158,6 +182,8 @@ class UpdateDialog(tkinter.Toplevel):
                                  params=params)
 
         content = response.content.decode()
+        print(content)
+
         results = json.loads(content)
 
         return results

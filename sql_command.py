@@ -1,4 +1,7 @@
-
+SELECT_DETAIL_BY_GPON_REPORT_OLT_AND_STATIS_TIME = """SELECT * 
+                                                      FROM ONUFIBERN
+                                                      WHERE GPON_REPORT_OLT = '{}'
+                                                      AND STATIS_TIME = '{}';"""
 
 SELECT_COUNT_IN_TIME_PERIOD = """SELECT MIN(STATIS_TIME), MAX(STATIS_TIME), COUNT(DISTINCT STATIS_TIME, GPON_REPORT_OLT, ONU_SN, FIBER_POWER_AVG)
                                  FROM ONUFIBERN
@@ -28,7 +31,7 @@ INSERT_ONUFIBERN = """INSERT INTO ONUFIBERN(GPON_REPORT_OLT, VENDOR, ZH_LABEL, I
                       LOWER_POWER_LIMIT, GATHER_NUM, ACHIEVE_NUM, UNACHIEVE_NUM, IS_OVERLOAD, ONU_ID, CELL_ID, 
                       CELL_NAME, CUSTOMER_ACCOUNT, ROOM_NO, FULL_ADDR, STATIS_CYCLE, OLT_PORT_ALIAS, ONU_NO, ONU_SN,
                       STATIS_TIME)
-                      VALUES """
+                      VALUES {};"""
 
 COLUMN_NAME_ONUFIBERN = ['GPON_REPORT_OLT', 'VENDOR', 'ZH_LABEL', 'INT_ID', 'DEVICE_TYPE', 'OLT_PORT_NAME',
                          'OLT_PORT_ID', 'OLT_NAME', 'OLT_IP_ADDRESS', 'OLT_ID', 'CONUTY_NAME', 'CITY_NAME', 'CITY_ID',
@@ -37,6 +40,12 @@ COLUMN_NAME_ONUFIBERN = ['GPON_REPORT_OLT', 'VENDOR', 'ZH_LABEL', 'INT_ID', 'DEV
                          'IS_OVERLOAD', 'ONU_ID', 'CELL_ID', 'CELL_NAME', 'CUSTOMER_ACCOUNT', 'ROOM_NO', 'FULL_ADDR',
                          'STATIS_CYCLE', 'OLT_PORT_ALIAS', 'ONU_NO', 'ONU_SN', 'STATIS_TIME']
 
+DETAIL_NAME_ONUFIBERN = ['GPON_REPORT_OLT', 'VENDOR', 'ZH_LABEL', 'INT_ID', 'DEVICE_TYPE', 'OLT_PORT_NAME',
+                         'OLT_PORT_ID', 'OLT_NAME', 'OLT_IP_ADDRESS', 'OLT_ID', 'CONUTY_NAME', 'CITY_NAME', 'CITY_ID',
+                         'ID', 'FIBER_MODULE_TYPE', 'IS_LOVER_ZH', 'FIBER_POWER_MAX', 'FIBER_POWER_MIN',
+                         'FIBER_POWER_AVG', 'LOWER_POWER_LIMIT', 'GATHER_NUM', 'ACHIEVE_NUM', 'UNACHIEVE_NUM',
+                         'IS_OVERLOAD', 'ONU_ID', 'CELL_ID', 'CELL_NAME', 'CUSTOMER_ACCOUNT', 'ROOM_NO', 'FULL_ADDR',
+                         'STATIS_CYCLE', 'OLT_PORT_ALIAS', 'ONU_NO', 'ONU_SN', 'STATIS_TIME']
 
 CREATE_ONUFIBERN_TABLE = """CREATE TABLE ONUFIBERN (
                             GPON_REPORT_OLT VARCHAR(255),
