@@ -77,16 +77,10 @@ class UpdateDialog(tkinter.Toplevel):
                 # Close Button
                 self.protocol("WM_DELETE_WINDOW", self.destroy)
                 return
-            # if not data_lst:
-            #     data_lst = []
 
             empty_days = empty_days + 1 if not data_lst else 0
             if empty_days == MAX_EMPTY_DAYS:
                 break
-
-            # for data in data_lst:
-            #     self._write_to_db(data)
-            #     self.update()
 
             if data_lst:
                 self._write_to_db(data_lst)
@@ -124,26 +118,6 @@ class UpdateDialog(tkinter.Toplevel):
 
         return update_time_lst
 
-    # def _write_to_db(self, data):
-    #     value_lst = []
-    #     for column_name in COLUMN_NAME_ONUFIBERN:
-    #         try:
-    #             value = data[column_name]
-    #             if type(value) == str:
-    #                 value_lst.append("'{}'".format(value))
-    #             else:
-    #                 value_lst.append("{}".format(value))
-    #         except KeyError:
-    #             value_lst.append('null')
-    #
-    #     insert_command = INSERT_ONUFIBERN + '({});'.format(', '.join(value_lst))
-    #     try:
-    #         self.cursor.execute(insert_command)
-    #         self.db.commit()
-    #     except Exception as e:
-    #         print(e)
-    #         self.db.rollback()
-
     def _write_to_db(self, data_lst=None):
         value_lst = []
         for data in data_lst:
@@ -157,7 +131,8 @@ class UpdateDialog(tkinter.Toplevel):
                         data_str_lst.append("{}".format(value))
                 except KeyError:
                     data_str_lst.append('null')
-            value_lst.append('({})'.format(', '.join(value_lst)))
+            value_lst.append('({})'.format(', '.join(data_str_lst)))
+
         insert_command = INSERT_ONUFIBERN.format(', '.join(value_lst))
         try:
             self.cursor.execute(insert_command)
@@ -182,7 +157,6 @@ class UpdateDialog(tkinter.Toplevel):
                                  params=params)
 
         content = response.content.decode()
-        print(content)
 
         results = json.loads(content)
 
